@@ -46,16 +46,7 @@ cc_library(
         "zig/src/zig_llvm-ar.cpp",
     ],
     hdrs = ["zig/src/zig_llvm.h"],
-    copts = [
-        "-std=c++17",
-        "-fno-exceptions",
-        "-fno-rtti",
-        "-fno-stack-protector",
-        "-fvisibility-inlines-hidden",
-        "-Wno-type-limits",
-        "-Wno-missing-braces",
-        "-Wno-comment",
-    ],
+    copts = ["-std=c++17"],
     defines = [
         "LLVM_BUILD_STATIC",
         "CLANG_BUILD_STATIC",
