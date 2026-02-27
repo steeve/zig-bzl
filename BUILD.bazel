@@ -1,0 +1,147 @@
+load("@rules_cc//cc:defs.bzl", "cc_library")
+load("@rules_zig//zig:defs.bzl", "zig_binary", "zig_library", "zig_test")
+
+package(default_visibility = ["//visibility:public"])
+
+# Imported by zig/src/main.zig as `@import("aro")`.
+zig_library(
+    name = "aro",
+    srcs = glob(["zig/lib/compiler/aro/**/*.zig"]),
+    extra_srcs = glob(
+        ["zig/lib/compiler/aro/**"],
+        exclude = ["zig/lib/compiler/aro/**/*.zig"],
+    ),
+    main = "zig/lib/compiler/aro/aro.zig",
+)
+
+zig_library(
+    name = "build_options",
+    main = "build_options.zig",
+)
+
+# Matches addCompilerMod() in build.zig.
+zig_library(
+    name = "compiler_mod",
+    srcs = glob(
+        [
+            "zig/src/**/*.zig",
+        ],
+        exclude = [
+            "zig/src/build_options.zig",
+        ],
+    ),
+    extra_srcs = glob(
+        ["zig/src/**"],
+        exclude = [
+            "zig/src/**/*.zig",
+            "zig/src/build_options.zig",
+        ],
+    ),
+    main = "zig/src/main.zig",
+    deps = [
+        ":aro",
+        ":build_options",
+    ],
+)
+
+# Matches addCompilerStep() in build.zig.
+cc_library(
+    name = "zig_cpp",
+    srcs = [
+        "zig/src/zig_clang_cc1_main.cpp",
+        "zig/src/zig_clang_cc1as_main.cpp",
+        "zig/src/zig_clang_driver.cpp",
+        "zig/src/zig_llvm.cpp",
+        "zig/src/zig_llvm-ar.cpp",
+    ],
+    hdrs = ["zig/src/zig_llvm.h"],
+    copts = [
+        "-std=c++17",
+        "-D__STDC_CONSTANT_MACROS",
+        "-D__STDC_FORMAT_MACROS",
+        "-D__STDC_LIMIT_MACROS",
+        "-D_GNU_SOURCE",
+        "-fno-exceptions",
+        "-fno-rtti",
+        "-fno-stack-protector",
+        "-fvisibility-inlines-hidden",
+        "-Wno-type-limits",
+        "-Wno-missing-braces",
+        "-Wno-comment",
+    ],
+    deps = [
+        "@llvm-project//clang:basic",
+        "@llvm-project//clang:codegen",
+        "@llvm-project//clang:frontend_tool",
+        "@llvm-project//lld:COFF",
+        "@llvm-project//lld:Common",
+        "@llvm-project//lld:ELF",
+        "@llvm-project//lld:Wasm",
+        "@llvm-project//llvm:DlltoolDriver",
+        "@llvm-project//llvm:LibDriver",
+    ],
+)
+
+zig_binary(
+    name = "zig",
+    srcs = glob(
+        [
+            "zig/src/**/*.zig",
+        ],
+        exclude = [
+            "zig/src/build_options.zig",
+        ],
+    ),
+    extra_srcs = glob(
+        ["zig/src/**"],
+        exclude = [
+            "zig/src/**/*.zig",
+            "zig/src/build_options.zig",
+        ],
+    ),
+    main = "zig/src/main.zig",
+    deps = [
+        ":aro",
+        ":build_options",
+        ":zig_cpp",
+    ],
+)
+
+# Matches the "test-unit" step in build.zig.
+zig_test(
+    name = "zig_unit_tests",
+    deps = [
+        ":compiler_mod",
+    ],
+)
+
+# Matches tools binaries created in build.zig.
+zig_binary(
+    name = "doctest",
+    srcs = glob(["tools/**/*.zig"]),
+    extra_srcs = glob(
+        ["tools/**"],
+        exclude = ["tools/**/*.zig"],
+    ),
+    main = "tools/doctest.zig",
+)
+
+zig_binary(
+    name = "docgen",
+    srcs = glob(["tools/**/*.zig"]),
+    extra_srcs = glob(
+        ["tools/**"],
+        exclude = ["tools/**/*.zig"],
+    ),
+    main = "tools/docgen.zig",
+)
+
+zig_binary(
+    name = "update_mingw",
+    srcs = glob(["tools/**/*.zig"]),
+    extra_srcs = glob(
+        ["tools/**"],
+        exclude = ["tools/**/*.zig"],
+    ),
+    main = "tools/update_mingw.zig",
+)
