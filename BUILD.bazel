@@ -22,20 +22,10 @@ zig_library(
 # Matches addCompilerMod() in build.zig.
 zig_library(
     name = "compiler_mod",
-    srcs = glob(
-        [
-            "zig/src/**/*.zig",
-        ],
-        exclude = [
-            "zig/src/build_options.zig",
-        ],
-    ),
+    srcs = glob(["zig/src/**/*.zig"]),
     extra_srcs = glob(
-        ["zig/src/**"],
-        exclude = [
-            "zig/src/**/*.zig",
-            "zig/src/build_options.zig",
-        ],
+        include = ["zig/src/**"],
+        exclude = ["zig/src/**/*.zig"],
     ),
     main = "zig/src/main.zig",
     deps = [
@@ -84,20 +74,10 @@ cc_library(
 
 zig_binary(
     name = "zig",
-    srcs = glob(
-        [
-            "zig/src/**/*.zig",
-        ],
-        exclude = [
-            "zig/src/build_options.zig",
-        ],
-    ),
+    srcs = glob(["zig/src/**/*.zig"]),
     extra_srcs = glob(
-        ["zig/src/**"],
-        exclude = [
-            "zig/src/**/*.zig",
-            "zig/src/build_options.zig",
-        ],
+        include = ["zig/src/**"],
+        exclude = ["zig/src/**/*.zig"],
     ),
     main = "zig/src/main.zig",
     deps = [
@@ -110,9 +90,7 @@ zig_binary(
 # Matches the "test-unit" step in build.zig.
 zig_test(
     name = "zig_unit_tests",
-    deps = [
-        ":compiler_mod",
-    ],
+    deps = [":compiler_mod"],
 )
 
 # Matches tools binaries created in build.zig.
@@ -120,7 +98,7 @@ zig_binary(
     name = "doctest",
     srcs = glob(["tools/**/*.zig"]),
     extra_srcs = glob(
-        ["tools/**"],
+        include = ["tools/**"],
         exclude = ["tools/**/*.zig"],
     ),
     main = "tools/doctest.zig",
@@ -130,7 +108,7 @@ zig_binary(
     name = "docgen",
     srcs = glob(["tools/**/*.zig"]),
     extra_srcs = glob(
-        ["tools/**"],
+        include = ["tools/**"],
         exclude = ["tools/**/*.zig"],
     ),
     main = "tools/docgen.zig",
@@ -140,7 +118,7 @@ zig_binary(
     name = "update_mingw",
     srcs = glob(["tools/**/*.zig"]),
     extra_srcs = glob(
-        ["tools/**"],
+        include = ["tools/**"],
         exclude = ["tools/**/*.zig"],
     ),
     main = "tools/update_mingw.zig",
