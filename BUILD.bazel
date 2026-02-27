@@ -8,7 +8,7 @@ zig_library(
     name = "aro",
     srcs = glob(["zig/lib/compiler/aro/**/*.zig"]),
     extra_srcs = glob(
-        ["zig/lib/compiler/aro/**"],
+        include = ["zig/lib/compiler/aro/**"],
         exclude = ["zig/lib/compiler/aro/**/*.zig"],
     ),
     main = "zig/lib/compiler/aro/aro.zig",
@@ -31,6 +31,7 @@ zig_library(
     deps = [
         ":aro",
         ":build_options",
+        ":zig_cpp",
     ],
 )
 
@@ -74,17 +75,7 @@ cc_library(
 
 zig_binary(
     name = "zig",
-    srcs = glob(["zig/src/**/*.zig"]),
-    extra_srcs = glob(
-        include = ["zig/src/**"],
-        exclude = ["zig/src/**/*.zig"],
-    ),
-    main = "zig/src/main.zig",
-    deps = [
-        ":aro",
-        ":build_options",
-        ":zig_cpp",
-    ],
+    deps = [":compiler_mod"],
 )
 
 # Matches the "test-unit" step in build.zig.
