@@ -42,27 +42,29 @@ zig_library(
     srcs = glob(["zig/src/**/*.zig"]),
     extra_srcs = glob(
         include = ["zig/src/**"],
-        exclude = ["zig/src/**/*.zig"],
+        exclude = [
+            "zig/src/**/*.zig",
+            "zig/lib/compiler/aro/**",
+        ],
     ),
     main = "zig/src/main.zig",
     deps = [
         ":aro",
         ":build_options",
-        ":zig_cpp",
+        ":zig_clang",
+        ":zig_llvm",
+        ":zig_llvm_ar",
     ],
 )
 
 # Matches addCompilerStep() in build.zig.
 cc_library(
-    name = "zig_cpp",
+    name = "zig_clang",
     srcs = [
         "zig/src/zig_clang_cc1_main.cpp",
         "zig/src/zig_clang_cc1as_main.cpp",
         "zig/src/zig_clang_driver.cpp",
-        "zig/src/zig_llvm.cpp",
-        "zig/src/zig_llvm-ar.cpp",
     ],
-    hdrs = ["zig/src/zig_llvm.h"],
     copts = ["-std=c++17"],
     defines = [
         "LLVM_BUILD_STATIC",
@@ -71,13 +73,66 @@ cc_library(
     deps = [
         "@llvm-project//clang:basic",
         "@llvm-project//clang:codegen",
+        "@llvm-project//clang:config",
+        "@llvm-project//clang:driver",
+        "@llvm-project//clang:frontend",
         "@llvm-project//clang:frontend_tool",
+        "@llvm-project//clang:serialization",
+        "@llvm-project//llvm:CodeGen",
+        "@llvm-project//llvm:MC",
+        "@llvm-project//llvm:MCParser",
+        "@llvm-project//llvm:Option",
+        "@llvm-project//llvm:Support",
+        "@llvm-project//llvm:Target",
+        "@llvm-project//llvm:TargetParser",
+        "@llvm-project//llvm:config",
+        "@llvm-project//llvm:ir_headers",
+    ],
+)
+
+cc_library(
+    name = "zig_llvm",
+    srcs = [
+        "zig/src/zig_llvm.cpp",
+        "zig/src/zig_llvm.h",
+    ],
+    copts = ["-std=c++17"],
+    defines = ["LLVM_BUILD_STATIC"],
+    deps = [
         "@llvm-project//lld:COFF",
         "@llvm-project//lld:Common",
         "@llvm-project//lld:ELF",
         "@llvm-project//lld:Wasm",
+        "@llvm-project//llvm:Analysis",
+        "@llvm-project//llvm:BitWriter",
+        "@llvm-project//llvm:IPO",
+        "@llvm-project//llvm:Instrumentation",
+        "@llvm-project//llvm:MC",
+        "@llvm-project//llvm:Object",
+        "@llvm-project//llvm:Passes",
+        "@llvm-project//llvm:Scalar",
+        "@llvm-project//llvm:Support",
+        "@llvm-project//llvm:Target",
+        "@llvm-project//llvm:TransformUtils",
+        "@llvm-project//llvm:ir_headers",
+    ],
+)
+
+cc_library(
+    name = "zig_llvm_ar",
+    srcs = [
+        "zig/src/zig_llvm-ar.cpp",
+    ],
+    copts = ["-std=c++17"],
+    defines = ["LLVM_BUILD_STATIC"],
+    deps = [
+        "@llvm-project//llvm:BinaryFormat",
         "@llvm-project//llvm:DlltoolDriver",
         "@llvm-project//llvm:LibDriver",
+        "@llvm-project//llvm:Object",
+        "@llvm-project//llvm:Support",
+        "@llvm-project//llvm:TargetParser",
+        "@llvm-project//llvm:ir_headers",
     ],
 )
 
