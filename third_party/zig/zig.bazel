@@ -1,6 +1,8 @@
 load("@rules_cc//cc:defs.bzl", "cc_library")
 load("@rules_zig//zig:defs.bzl", "zig_binary", "zig_library")
 
+package(default_visibility = ["//visibility:public"])
+
 zig_library(
     name = "aro",
     srcs = glob(["lib/compiler/aro/**/*.zig"]),

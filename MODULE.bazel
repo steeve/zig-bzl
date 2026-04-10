@@ -2,27 +2,25 @@ module(
     name = "zml",
 )
 
-bazel_dep(name = "aspect_bazel_lib", version = "2.22.5")
 bazel_dep(name = "bazel_skylib", version = "1.9.0")
+bazel_dep(name = "bazel_lib", version = "3.0.0")
 bazel_dep(name = "platforms", version = "1.0.0")
 bazel_dep(name = "rules_cc", version = "0.2.17")
 bazel_dep(name = "rules_shell", version = "0.6.1")
 bazel_dep(name = "rules_zig", version = "0.12.2")
-bazel_dep(name = "llvm", version = "0.6.1")
+bazel_dep(name = "llvm", version = "0.7.0")
 bazel_dep(name = "rules_python", version = "1.9.0")
-
-git_override(
-    module_name = "llvm",
-    commit = "cf7fa9591c68d3127f78ca169db3bc7616fcded4",
-    remote = "https://github.com/cerisier/toolchains_llvm_bootstrapped",
-)
+bazel_dep(name = "with_cfg.bzl", version = "0.14.6")
 
 bazel_dep(name = "buildifier_prebuilt", version = "8.2.1.2", dev_dependency = True)
 
 ### Zig toolchain
 zig = use_extension("@rules_zig//zig:extensions.bzl", "zig")
 zig.index(file = "//:index.json")
-zig.toolchain(zig_version = "0.16.0-dev.2821+3edaef9e0")
+zig.toolchain(
+    translate_c = "@translate-c",
+    zig_version = "0.16.0-dev.2821+3edaef9e0",
+)
 zig.mirrors(urls = [
     "https://pkg.machengine.org/zig",
     "https://zigmirror.hryx.net/zig",
@@ -41,11 +39,14 @@ zig.mirrors(urls = [
 ])
 use_repo(zig, "zig_toolchains")
 
+
+register_toolchains("//:all")
+
 register_toolchains("@rules_zig//zig/target:all")
 
 register_toolchains("@zig_toolchains//:all")
 
-register_toolchains("//:all")
+
 
 ###
 
@@ -58,7 +59,7 @@ register_toolchains("@llvm//toolchain:all")
 ###
 
 non_module_deps = use_extension("//:third_party/non_module_deps.bzl", "non_module_deps")
-use_repo(non_module_deps, "llvm-raw", "llvm_zlib", "llvm_zstd", "zig")
+use_repo(non_module_deps, "llvm-raw", "llvm_zlib", "llvm_zstd", "zig", "arocc", "translate-c")
 
 llvm = use_extension("//third_party/llvm-project:llvm.bzl", "llvm")
 llvm.configure(
@@ -91,13 +92,13 @@ inject_repo(llvm, "rules_python", "rules_cc", "rules_shell")
 
 use_repo(llvm, "llvm-project")
 
-# git_override(
-#     module_name = "rules_zig",
-#     commit = "6c5d6a07b4ef48be894e7418bcae37bac54e1c2e",
-#     remote = "https://github.com/zml/rules_zig.git",
-# )
-
-local_path_override(
+git_override(
     module_name = "rules_zig",
-    path = "../rules_zig",
+    commit = "27f7d54d01b969f1f3ba84464c64f55a5c38d6e1",
+    remote = "https://github.com/zml/rules_zig.git",
 )
+
+# local_path_override(
+#     module_name = "rules_zig",
+#     path = "../../zml/rules_zig",
+# )

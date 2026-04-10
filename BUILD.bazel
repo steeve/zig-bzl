@@ -1,6 +1,9 @@
 load("@bazel_skylib//rules:common_settings.bzl", "bool_setting")
-load("@rules_zig//zig:defs.bzl", "zig_binary")
+load("@rules_zig//zig:defs.bzl", "zig_binary", "zig_asm")
 load("@rules_zig//zig:toolchain.bzl", "zig_target_toolchain", "zig_toolchain")
+load(":bootstrap_binary.bzl", "bootstrap_binary", "bootstrap_directory")
+load(":kvx_filegroup.bzl", "kvx_filegroup")
+load("@bazel_lib//lib:transitions.bzl", "platform_transition_filegroup")
 
 package(features = ["layering_check"])
 
@@ -48,37 +51,48 @@ platform(
     visibility = ["//visibility:public"],
 )
 
-bool_setting(
-    name = "from_source",
-    build_setting_default = False,
-)
+# bool_setting(
+#     name = "from_source",
+#     build_setting_default = False,
+# )
 
-config_setting(
-    name = "source",
-    values = {
-        ":from_source": "true",
-    },
-)
+# config_setting(
+#     name = "source",
+#     flag_values = {
+#         ":from_source": "True",
+#     },
+# )
+
+# bootstrap_binary(
+#     name = "zig_from_source_binary",
+#     actual = "@zig//:zig",
+# )
 
 zig_toolchain(
-    name = "zig_kvx",
-    zig_cache = "/tmp/zig-cache",
+    name = "zig_from_source",
+    zig_cache = "/var/tmp/zig-cache",
+    # zig_exe = ":zig_from_source_binary",
     zig_exe = "@zig//:zig",
     zig_lib = ["@zig//:lib"],
-    zig_version = "0.16.0-dev.2821+3edaef9e0",
+    zig_lib_path = "lib",
+    zig_version = "0.16.0",
 )
 
 toolchain(
     name = "zig-kvx_toolchain",
+    # exec_compatible_with = [
+    #     "@platforms//os:macos",
+    #     "@platforms//cpu:aarch64",
+    # ],
     target_compatible_with = [
         "//:kvx",
         "//:cos",
     ],
-    target_settings = [
-        "//:source",
-    ],
-    toolchain = ":zig_kvx",
-    toolchain_type = "@rules_zig//zig/target:toolchain_type",
+    # target_settings = [
+    #     ":source",
+    # ],
+    toolchain = ":zig_from_source",
+    toolchain_type = "@rules_zig//zig:toolchain_type",
 )
 
 zig_target_toolchain(
@@ -86,244 +100,36 @@ zig_target_toolchain(
     target = "kvx-cos",
 )
 
-# toolchain(
-#     name = "kvx-cos_toolchain",
-#     target_compatible_with = [
-#         "//:kvx",
-#         "//:cos",
-#     ],
-#     toolchain = "kvx-cos",
-#     toolchain_type = "@rules_zig//zig/target:toolchain_type",
+toolchain(
+    name = "kvx-cos_toolchain",
+    target_compatible_with = [
+        "//:kvx",
+        "//:cos",
+    ],
+    toolchain = "kvx-cos",
+    toolchain_type = "@rules_zig//zig/target:toolchain_type",
+)
+
+zig_asm(
+    name = "kvx_add",
+    main = "add.zig",
+)
+
+# kvx_filegroup(
+#     name = "kvx_files",
+#     srcs = [':kvx_add'],
 # )
 
+platform_transition_filegroup(
+    name = "kvx_asm",
+    srcs = ["kvx_add"],
+    target_platform = "//:kvx_cos",
+)
 
 zig_binary(
     name = "main",
     main = "main.zig",
+    data = [
+        ":kvx_asm",
+    ],
 )
-
-# Imported by zig/src/main.zig as `@import("aro")`.
-# zig_library(
-#     name = "aro",
-#     srcs = glob(["zig/lib/compiler/aro/**/*.zig"]),
-#     extra_srcs = glob(
-#         include = ["zig/lib/compiler/aro/**"],
-#         exclude = ["zig/lib/compiler/aro/**/*.zig"],
-#     ),
-#     main = "zig/lib/compiler/aro/aro.zig",
-# )
-
-# zig_library(
-#     name = "build_options",
-#     main = "build_options.zig",
-# )
-
-# filegroup(
-#     name = "zig_lib",
-#     srcs = ["zig/lib"],
-# )
-
-# # Matches addCompilerMod() in build.zig.
-# zig_library(
-#     name = "compiler_mod",
-#     srcs = glob(["zig/src/**/*.zig"]),
-#     extra_srcs = glob(
-#         include = ["zig/src/**"],
-#         exclude = [
-#             "zig/src/**/*.zig",
-#             "zig/lib/compiler/aro/**",
-#         ],
-#     ),
-#     main = "zig/src/main.zig",
-#     deps = [
-#         ":aro",
-#         ":build_options",
-#         # ":zig_clang",
-#         ":zig_llvm",
-#         # ":zig_llvm_ar",
-#     ],
-# )
-
-# # Matches addCompilerStep() in build.zig.
-# cc_library(
-#     name = "zig_clang",
-#     srcs = [
-#         "zig/src/zig_clang_cc1_main.cpp",
-#         "zig/src/zig_clang_cc1as_main.cpp",
-#         "zig/src/zig_clang_driver.cpp",
-#     ],
-#     copts = ["-std=c++17"],
-#     defines = [
-#         "LLVM_BUILD_STATIC",
-#         "CLANG_BUILD_STATIC",
-#     ],
-#     deps = [
-#         "@llvm-project//clang:basic",
-#         "@llvm-project//clang:codegen",
-#         "@llvm-project//clang:config",
-#         "@llvm-project//clang:driver",
-#         "@llvm-project//clang:frontend",
-#         "@llvm-project//clang:frontend_tool",
-#         "@llvm-project//clang:serialization",
-#         "@llvm-project//llvm:CodeGen",
-#         "@llvm-project//llvm:MC",
-#         "@llvm-project//llvm:MCParser",
-#         "@llvm-project//llvm:Option",
-#         "@llvm-project//llvm:Support",
-#         "@llvm-project//llvm:Target",
-#         "@llvm-project//llvm:TargetParser",
-#         "@llvm-project//llvm:config",
-#         "@llvm-project//llvm:ir_headers",
-#     ],
-# )
-
-# cc_library(
-#     name = "zig_llvm",
-#     srcs = [
-#         "zig/src/zig_llvm.cpp",
-#         "zig/src/zig_llvm.h",
-#     ],
-#     copts = ["-std=c++17"],
-#     defines = ["LLVM_BUILD_STATIC"],
-#     deps = [
-#         "@llvm-project//lld:COFF",
-#         "@llvm-project//lld:Common",
-#         "@llvm-project//lld:ELF",
-#         "@llvm-project//lld:Wasm",
-#         "@llvm-project//llvm:Analysis",
-#         "@llvm-project//llvm:BitWriter",
-#         "@llvm-project//llvm:IPO",
-#         "@llvm-project//llvm:Instrumentation",
-#         "@llvm-project//llvm:MC",
-#         "@llvm-project//llvm:Object",
-#         "@llvm-project//llvm:Passes",
-#         "@llvm-project//llvm:Scalar",
-#         "@llvm-project//llvm:Support",
-#         "@llvm-project//llvm:Target",
-#         "@llvm-project//llvm:TransformUtils",
-#         "@llvm-project//llvm:ir_headers",
-#     ],
-# )
-
-# cc_library(
-#     name = "zig_llvm_ar",
-#     srcs = ["zig/src/zig_llvm-ar.cpp"],
-#     copts = ["-std=c++17"],
-#     defines = ["LLVM_BUILD_STATIC"],
-#     deps = [
-#         "@llvm-project//llvm:BinaryFormat",
-#         "@llvm-project//llvm:DlltoolDriver",
-#         "@llvm-project//llvm:LibDriver",
-#         "@llvm-project//llvm:Object",
-#         "@llvm-project//llvm:Support",
-#         "@llvm-project//llvm:TargetParser",
-#         "@llvm-project//llvm:ir_headers",
-#     ],
-# )
-
-# zig_binary(
-#     name = "zig_exe",
-#     data = [":zig_lib"],
-#     env = {
-#         "ZIG_LIB_DIR": "$(execpath :zig_lib)",
-#     },
-#     deps = [":compiler_mod"],
-# )
-
-# # Matches the "test-unit" step in build.zig.
-# zig_test(
-#     name = "zig_unit_tests",
-#     deps = [":compiler_mod"],
-# )
-
-# # Matches tools binaries created in build.zig.
-# zig_binary(
-#     name = "doctest",
-#     srcs = glob(["tools/**/*.zig"]),
-#     extra_srcs = glob(
-#         include = ["tools/**"],
-#         exclude = ["tools/**/*.zig"],
-#     ),
-#     main = "tools/doctest.zig",
-# )
-
-# zig_binary(
-#     name = "docgen",
-#     srcs = glob(["tools/**/*.zig"]),
-#     extra_srcs = glob(
-#         include = ["tools/**"],
-#         exclude = ["tools/**/*.zig"],
-#     ),
-#     main = "tools/docgen.zig",
-# )
-
-# zig_binary(
-#     name = "update_mingw",
-#     srcs = glob(["tools/**/*.zig"]),
-#     extra_srcs = glob(
-#         include = ["tools/**"],
-#         exclude = ["tools/**/*.zig"],
-#     ),
-#     main = "tools/update_mingw.zig",
-# )
-
-# constraint_setting(
-#     name = "zig_bootstrapped_setting",
-# )
-
-# constraint_value(
-#     name = "zig_bootstrapped_value",
-#     constraint_setting = ":zig_bootstrapped_setting",
-# )
-
-# platform(
-#     name = "zig_bootstrapped_platform",
-#     constraint_values = [
-#         ":zig_bootstrapped_value",
-#     ],
-#     parents = ["@platforms//host"],
-# )
-
-# zig_toolchain(
-#     name = "zig_bootstrapped",
-#     zig_cache = "/var/tmp/zig-cache",
-#     zig_exe = ":zig_exe",
-#     zig_lib = [":zig_lib"],
-#     zig_version = "0.16.0",
-# )
-
-# toolchain(
-#     name = "zig-bootstrapped_toolchain",
-#     exec_compatible_with = [
-#         "@platforms//os:macos",
-#         "@platforms//cpu:aarch64",
-#     ],
-#     target_compatible_with = [
-#         "@platforms//os:macos",
-#         "@platforms//cpu:aarch64",
-#         "//:zig_bootstrapped_value",
-#     ],
-#     target_settings = [],
-#     toolchain = ":zig_bootstrapped",
-#     toolchain_type = "@rules_zig//zig:toolchain_type",
-# )
-
-# # zig_target_toolchain(
-# #     name = "kvx-cos",
-# #     target = "kvx-cos",
-# # )
-
-# # toolchain(
-# #     name = "kvx-cos_toolchain",
-# #     target_compatible_with = [
-# #         "@toolchains_gcc_kvx//constraint:kvx",
-# #         "@toolchains_gcc_kvx//constraint:cos",
-# #     ],
-# #     toolchain = "kvx-cos",
-# #     toolchain_type = "@rules_zig//zig/target:toolchain_type",
-# # )
-
-# zig_binary(
-#     name = "main",
-#     main = "main.zig",
-# )

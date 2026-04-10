@@ -1,19 +1,20 @@
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
+load("@bazel_tools//tools/build_defs/repo:git.bzl", "new_git_repository")
 load("@bazel_tools//tools/build_defs/repo:local.bzl", "new_local_repository")
 
 def repo():
-    new_local_repository(
-        name = "llvm-raw",
-        path = "/Users/steeve/code/github.com/zml/zig-bzl/llvm-project",
-        build_file_content = "#",
-    )
-
-    # new_git_repository(
+    # new_local_repository(
     #     name = "llvm-raw",
-    #     remote = "git@github.com:zml/llvm-project.git",
-    #     commit = "6d72147773889a7a31b613758e23806fff3177a8",
+    #     path = "../../llvm/llvm-project",
     #     build_file_content = "#",
     # )
+
+    new_git_repository(
+        name = "llvm-raw",
+        remote = "git@github.com:zml/llvm-project.git",
+        commit = "eed845fd3a73dcca94bd23a990034d19a24c97ee",
+        build_file_content = "#",
+    )
     http_archive(
         name = "llvm_zlib",
         build_file = "@llvm-raw//utils/bazel/third_party_build:zlib-ng.BUILD",
