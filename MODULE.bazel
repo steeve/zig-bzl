@@ -3,17 +3,26 @@ module(
 )
 
 bazel_dep(name = "aspect_bazel_lib", version = "2.22.5")
+bazel_dep(name = "bazel_skylib", version = "1.9.0")
 bazel_dep(name = "platforms", version = "1.0.0")
-bazel_dep(name = "rules_cc", version = "0.2.16")
+bazel_dep(name = "rules_cc", version = "0.2.17")
+bazel_dep(name = "rules_shell", version = "0.6.1")
 bazel_dep(name = "rules_zig", version = "0.12.2")
 bazel_dep(name = "llvm", version = "0.6.1")
+bazel_dep(name = "rules_python", version = "1.9.0")
+
+git_override(
+    module_name = "llvm",
+    commit = "cf7fa9591c68d3127f78ca169db3bc7616fcded4",
+    remote = "https://github.com/cerisier/toolchains_llvm_bootstrapped",
+)
 
 bazel_dep(name = "buildifier_prebuilt", version = "8.2.1.2", dev_dependency = True)
 
 ### Zig toolchain
 zig = use_extension("@rules_zig//zig:extensions.bzl", "zig")
 zig.index(file = "//:index.json")
-zig.toolchain(zig_version = "0.16.0-dev.2676+4e2cec265")
+zig.toolchain(zig_version = "0.16.0-dev.2821+3edaef9e0")
 zig.mirrors(urls = [
     "https://pkg.machengine.org/zig",
     "https://zigmirror.hryx.net/zig",
@@ -35,13 +44,23 @@ use_repo(zig, "zig_toolchains")
 register_toolchains("@rules_zig//zig/target:all")
 
 register_toolchains("@zig_toolchains//:all")
+
+register_toolchains("//:all")
+
 ###
+
+# llvm_source = use_extension("@llvm//extensions:llvm_source.bzl", "llvm_source")
+# llvm_source.version(llvm_version = "21.1.0")
+# use_repo(llvm_source, "compiler-rt", "libcxx", "libcxxabi", "libunwind", "llvm-raw", "llvm_zlib", "llvm_zstd")
 
 ### LLVM toolchains
 register_toolchains("@llvm//toolchain:all")
 ###
 
-llvm = use_extension("@llvm//extensions:llvm.bzl", "llvm")
+non_module_deps = use_extension("//:third_party/non_module_deps.bzl", "non_module_deps")
+use_repo(non_module_deps, "llvm-raw", "llvm_zlib", "llvm_zstd", "zig")
+
+llvm = use_extension("//third_party/llvm-project:llvm.bzl", "llvm")
 llvm.configure(
     targets = [
         "AArch64",
@@ -50,6 +69,7 @@ llvm.configure(
         "AVR",
         "BPF",
         "Hexagon",
+        "KVX",
         "Lanai",
         "LoongArch",
         "Mips",
@@ -66,6 +86,9 @@ llvm.configure(
         "XCore",
     ],
 )
+
+inject_repo(llvm, "rules_python", "rules_cc", "rules_shell")
+
 use_repo(llvm, "llvm-project")
 
 # git_override(
@@ -76,5 +99,5 @@ use_repo(llvm, "llvm-project")
 
 local_path_override(
     module_name = "rules_zig",
-    path = "./rules_zig",
+    path = "../rules_zig",
 )
