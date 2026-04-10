@@ -74,5 +74,9 @@ filegroup(
 
 zig_binary(
     name = "zig",
+    linkopts = [
+        # Mandatory if we link with zig and not cc_common.link
+        "-lc++",
+    ],
     deps = [":compiler_mod"],
 )

@@ -12,7 +12,7 @@ def repo():
     new_git_repository(
         name = "llvm-raw",
         remote = "git@github.com:zml/llvm-project.git",
-        commit = "eed845fd3a73dcca94bd23a990034d19a24c97ee",
+        commit = "4612f8ed16306c96badbba21b4c2a7a447a8ad39",
         build_file_content = "#",
     )
     http_archive(
