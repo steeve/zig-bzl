@@ -125,6 +125,9 @@ toolchain(
 zig_asm(
     name = "kvx_add",
     main = "add.zig",
+    # Zig 0.16 enables stack protection in safe builds, but kvx-cos does not
+    # provide the required stack-protector libcall yet.
+    zigopts = ["-fno-stack-protector"],
 )
 
 platform_transition_filegroup(
