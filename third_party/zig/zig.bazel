@@ -39,6 +39,10 @@ cc_library(
         "src/zig_llvm.h",
     ],
     copts = ["-std=c++17"],
+    linkopts = [
+        # Mandatory if we link with zig and not cc_common.link
+        "-lc++",
+    ],
     defines = ["LLVM_BUILD_STATIC"],
     deps = [
         "@llvm-project//lld:COFF",
@@ -72,11 +76,19 @@ filegroup(
     visibility = ["//visibility:public"],
 )
 
+filegroup(
+    name = "lib_files",
+    srcs = glob(["lib/**"]),
+    visibility = ["//visibility:public"],
+)
+
+filegroup(
+    name = "zig_h",
+    srcs = ["lib/zig.h"],
+    visibility = ["//visibility:public"],
+)
+
 zig_binary(
     name = "zig",
-    linkopts = [
-        # Mandatory if we link with zig and not cc_common.link
-        "-lc++",
-    ],
     deps = [":compiler_mod"],
 )

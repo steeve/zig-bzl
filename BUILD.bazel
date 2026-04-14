@@ -2,7 +2,6 @@ load("@bazel_skylib//rules:common_settings.bzl", "bool_setting")
 load("@rules_zig//zig:defs.bzl", "zig_binary", "zig_asm")
 load("@rules_zig//zig:toolchain.bzl", "zig_target_toolchain", "zig_toolchain")
 load(":bootstrap_binary.bzl", "bootstrap_binary", "bootstrap_directory")
-load(":kvx_filegroup.bzl", "kvx_filegroup")
 load("@bazel_lib//lib:transitions.bzl", "platform_transition_filegroup")
 
 package(features = ["layering_check"])
@@ -51,30 +50,29 @@ platform(
     visibility = ["//visibility:public"],
 )
 
-# bool_setting(
-#     name = "from_source",
-#     build_setting_default = False,
-# )
+bool_setting(
+    name = "from_source",
+    build_setting_default = True,
+)
 
-# config_setting(
-#     name = "source",
-#     flag_values = {
-#         ":from_source": "True",
-#     },
-# )
+config_setting(
+    name = "source",
+    flag_values = {
+        ":from_source": "True",
+    },
+)
 
-# bootstrap_binary(
-#     name = "zig_from_source_binary",
-#     actual = "@zig//:zig",
-# )
+bootstrap_binary(
+    name = "zig_from_source_binary",
+    actual = "@zig//:zig",
+)
 
 zig_toolchain(
     name = "zig_from_source",
     zig_cache = "/var/tmp/zig-cache",
-    # zig_exe = ":zig_from_source_binary",
-    zig_exe = "@zig//:zig",
-    zig_lib = ["@zig//:lib"],
-    zig_lib_path = "lib",
+    zig_exe = ":zig_from_source_binary",
+    zig_h = "@zig//:zig_h",
+    zig_lib = ["@zig//:lib_files"],
     zig_version = "0.16.0",
 )
 
@@ -88,9 +86,23 @@ toolchain(
         "//:kvx",
         "//:cos",
     ],
+    # No need since there is no, non from source, kvx zig toolchain
     # target_settings = [
     #     ":source",
     # ],
+    toolchain = ":zig_from_source",
+    toolchain_type = "@rules_zig//zig:toolchain_type",
+)
+
+toolchain(
+    name = "zig-macos_toolchain",
+    target_compatible_with = [
+        "@platforms//os:macos",
+        "@platforms//cpu:aarch64",
+    ],
+    target_settings = [
+        ":source",
+    ],
     toolchain = ":zig_from_source",
     toolchain_type = "@rules_zig//zig:toolchain_type",
 )
@@ -115,11 +127,6 @@ zig_asm(
     main = "add.zig",
 )
 
-# kvx_filegroup(
-#     name = "kvx_files",
-#     srcs = [':kvx_add'],
-# )
-
 platform_transition_filegroup(
     name = "kvx_asm",
     srcs = ["kvx_add"],
@@ -129,7 +136,7 @@ platform_transition_filegroup(
 zig_binary(
     name = "main",
     main = "main.zig",
-    data = [
-        ":kvx_asm",
-    ],
+    # data = [
+    #     ":kvx_asm",
+    # ],
 )
