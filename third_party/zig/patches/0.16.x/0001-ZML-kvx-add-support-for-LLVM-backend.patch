@@ -1,5 +1,17 @@
+From 86180692470846eb44a8fb0863d92b68a4329a03 Mon Sep 17 00:00:00 2001
+From: Corentin Kerisit <corentin.kerisit@gmail.com>
+Date: Mon, 12 Jan 2026 17:52:16 +0100
+Subject: [PATCH 1/5] [ZML] kvx: add support for LLVM backend
+
+---
+ lib/std/Target/kvx.zig        |  4 ++--
+ src/codegen/llvm.zig          | 11 ++++++++---
+ src/codegen/llvm/bindings.zig |  4 ++++
+ src/target.zig                |  2 +-
+ 4 files changed, 15 insertions(+), 6 deletions(-)
+
 diff --git a/lib/std/Target/kvx.zig b/lib/std/Target/kvx.zig
-index a5cb7a24..7e3303e6 100644
+index a5cb7a24f5..7e3303e6f8 100644
 --- a/lib/std/Target/kvx.zig
 +++ b/lib/std/Target/kvx.zig
 @@ -49,14 +49,14 @@ pub const all_features = blk: {
@@ -20,10 +32,10 @@ index a5cb7a24..7e3303e6 100644
              .v3_2,
          }),
 diff --git a/src/codegen/llvm.zig b/src/codegen/llvm.zig
-index 1ba3b272..e20af823 100644
+index fc487d5a26..f086904eca 100644
 --- a/src/codegen/llvm.zig
 +++ b/src/codegen/llvm.zig
-@@ -65,6 +65,7 @@ pub fn targetTriple(allocator: Allocator, target: *const std.Target) ![]const u8
+@@ -69,6 +69,7 @@ pub fn targetTriple(allocator: Allocator, target: *const std.Target) ![]const u8
          .bpfel => "bpfel",
          .bpfeb => "bpfeb",
          .csky => "csky",
@@ -31,7 +43,7 @@ index 1ba3b272..e20af823 100644
          .hexagon => "hexagon",
          .loongarch32 => "loongarch32",
          .loongarch64 => "loongarch64",
-@@ -110,7 +111,6 @@ pub fn targetTriple(allocator: Allocator, target: *const std.Target) ![]const u8
+@@ -114,7 +115,6 @@ pub fn targetTriple(allocator: Allocator, target: *const std.Target) ![]const u8
          .hppa,
          .hppa64,
          .kalimba,
@@ -39,7 +51,7 @@ index 1ba3b272..e20af823 100644
          .microblaze,
          .microblazeel,
          .or1k,
-@@ -366,6 +366,7 @@ pub fn dataLayout(target: *const std.Target) []const u8 {
+@@ -369,6 +369,7 @@ pub fn dataLayout(target: *const std.Target) []const u8 {
          .avr => "e-P1-p:16:8-i8:8-i16:8-i32:8-i64:8-f32:8-f64:8-n8-a:8",
          .bpfeb => "E-m:e-p:64:64-i64:64-i128:128-n32:64-S128",
          .bpfel => "e-m:e-p:64:64-i64:64-i128:128-n32:64-S128",
@@ -47,7 +59,7 @@ index 1ba3b272..e20af823 100644
          .msp430 => "e-m:e-p:16:16-i32:16-i64:16-f32:16-f64:16-a:8-n8:16-S16",
          .mips => "E-m:m-p:32:32-i8:8:32-i16:16:32-i64:64-n32-S64",
          .mipsel => "e-m:m-p:32:32-i8:8:32-i16:16:32-i64:64-n32-S64",
-@@ -476,7 +477,6 @@ pub fn dataLayout(target: *const std.Target) []const u8 {
+@@ -479,7 +480,6 @@ pub fn dataLayout(target: *const std.Target) []const u8 {
          .hppa,
          .hppa64,
          .kalimba,
@@ -55,20 +67,20 @@ index 1ba3b272..e20af823 100644
          .microblaze,
          .microblazeel,
          .or1k,
-@@ -4899,6 +4899,12 @@ pub fn initializeLLVMTarget(arch: std.Target.Cpu.Arch) void {
-             bindings.LLVMInitializeSPIRVTargetMC();
-             bindings.LLVMInitializeSPIRVAsmPrinter();
+@@ -12870,6 +12870,12 @@ pub fn initializeLLVMTarget(arch: std.Target.Cpu.Arch) void {
+             llvm.LLVMInitializeSPIRVTargetMC();
+             llvm.LLVMInitializeSPIRVAsmPrinter();
          },
 +        .kvx => {
-+            bindings.LLVMInitializeKVXTarget();
-+            bindings.LLVMInitializeKVXTargetInfo();
-+            bindings.LLVMInitializeKVXTargetMC();
-+            bindings.LLVMInitializeKVXAsmPrinter();
++            llvm.LLVMInitializeKVXTarget();
++            llvm.LLVMInitializeKVXTargetInfo();
++            llvm.LLVMInitializeKVXTargetMC();
++            llvm.LLVMInitializeKVXAsmPrinter();
 +        },
  
          // LLVM does does not have a backend for these.
          .alpha,
-@@ -4906,7 +4912,6 @@ pub fn initializeLLVMTarget(arch: std.Target.Cpu.Arch) void {
+@@ -12877,7 +12883,6 @@ pub fn initializeLLVMTarget(arch: std.Target.Cpu.Arch) void {
          .hppa,
          .hppa64,
          .kalimba,
@@ -77,7 +89,7 @@ index 1ba3b272..e20af823 100644
          .microblazeel,
          .or1k,
 diff --git a/src/codegen/llvm/bindings.zig b/src/codegen/llvm/bindings.zig
-index 2baabe99..e83af2e5 100644
+index 2baabe99bf..e83af2e525 100644
 --- a/src/codegen/llvm/bindings.zig
 +++ b/src/codegen/llvm/bindings.zig
 @@ -214,6 +214,7 @@ pub extern fn LLVMInitializeVETargetInfo() void;
@@ -113,10 +125,10 @@ index 2baabe99..e83af2e5 100644
  pub extern fn LLVMInitializeAArch64AsmParser() void;
  pub extern fn LLVMInitializeAMDGPUAsmParser() void;
 diff --git a/src/target.zig b/src/target.zig
-index 3d04c06f..cb1169c0 100644
+index ca65239a09..e62d91459e 100644
 --- a/src/target.zig
 +++ b/src/target.zig
-@@ -194,6 +194,7 @@ pub fn hasLlvmSupport(target: *const std.Target, ofmt: std.Target.ObjectFormat)
+@@ -188,6 +188,7 @@ pub fn hasLlvmSupport(target: *const std.Target, ofmt: std.Target.ObjectFormat)
          .bpfel,
          .bpfeb,
          .hexagon,
@@ -124,7 +136,7 @@ index 3d04c06f..cb1169c0 100644
          .loongarch32,
          .loongarch64,
          .m68k,
-@@ -240,7 +241,6 @@ pub fn hasLlvmSupport(target: *const std.Target, ofmt: std.Target.ObjectFormat)
+@@ -234,7 +235,6 @@ pub fn hasLlvmSupport(target: *const std.Target, ofmt: std.Target.ObjectFormat)
          .hppa,
          .hppa64,
          .kalimba,
@@ -132,3 +144,6 @@ index 3d04c06f..cb1169c0 100644
          .microblaze,
          .microblazeel,
          .or1k,
+-- 
+2.50.1 (Apple Git-155)
+

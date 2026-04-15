@@ -1,24 +1,36 @@
+From ca04d0c476062e0324512054ed3de9424ec314d0 Mon Sep 17 00:00:00 2001
+From: Steeve Morin <steeve@zml.ai>
+Date: Wed, 14 Jan 2026 09:15:58 +0000
+Subject: [PATCH 3/5] [ZML] kvx: add ClusterOS target
+
+---
+ lib/std/Target.zig   | 10 ++++++++++
+ src/codegen/llvm.zig |  1 +
+ 2 files changed, 11 insertions(+)
+
 diff --git a/lib/std/Target.zig b/lib/std/Target.zig
-index 03ca4a77..1b837922 100644
+index 1b0c617598..81ee01e419 100644
 --- a/lib/std/Target.zig
 +++ b/lib/std/Target.zig
-@@ -67,6 +67,7 @@ pub const Os = struct {
-         opencl,
+@@ -67,6 +67,8 @@ pub const Os = struct {
          opengl,
          vulkan,
-+        cos,
  
++        cos,
++
          // LLVM tags deliberately omitted:
          // - bridgeos
-@@ -170,6 +171,7 @@ pub const Os = struct {
+         // - cheriotrtos
+@@ -169,6 +171,8 @@ pub const Os = struct {
                  .emscripten,
  
                  .mesa3d,
++
 +                .cos,
                  => .none,
  
                  .contiki,
-@@ -399,6 +401,7 @@ pub const Os = struct {
+@@ -397,6 +401,7 @@ pub const Os = struct {
                  .emscripten,
  
                  .mesa3d,
@@ -26,7 +38,7 @@ index 03ca4a77..1b837922 100644
                  => .{ .none = {} },
  
                  .contiki => .{
-@@ -942,6 +945,7 @@ pub const Abi = enum {
+@@ -930,6 +935,7 @@ pub const Abi = enum {
              .opencl,
              .opengl,
              .vulkan,
@@ -34,15 +46,15 @@ index 03ca4a77..1b837922 100644
              => .none,
          };
      }
-@@ -2198,6 +2202,7 @@ pub fn requiresLibC(target: *const Target) bool {
-         .dragonfly,
+@@ -2183,6 +2189,7 @@ pub fn requiresLibC(target: *const Target) bool {
+         .openbsd,
          .haiku,
          .serenity,
 +        .cos,
          => true,
  
          // Android API levels prior to 29 did not have native TLS support. For these API levels, TLS
-@@ -2362,6 +2367,7 @@ pub const DynamicLinker = struct {
+@@ -2345,6 +2352,7 @@ pub const DynamicLinker = struct {
              .tvos,
              .visionos,
              .watchos,
@@ -50,15 +62,15 @@ index 03ca4a77..1b837922 100644
              => .arch_os,
              .hurd,
              .linux,
-@@ -2815,6 +2821,7 @@ pub const DynamicLinker = struct {
-             .opencl,
-             .opengl,
-             .vulkan,
+@@ -2805,6 +2813,7 @@ pub const DynamicLinker = struct {
+             .ps3,
+             .ps4,
+             .ps5,
 +            .cos,
              => none,
- 
-             // TODO go over each item in this list and either move it to the above list, or
-@@ -3151,6 +3158,7 @@ pub fn cTypeBitSize(target: *const Target, c_type: CType) u16 {
+         } catch unreachable;
+     }
+@@ -3132,6 +3141,7 @@ pub fn cTypeBitSize(target: *const Target, c_type: CType) u16 {
          .hurd,
          .illumos,
          .linux,
@@ -67,10 +79,10 @@ index 03ca4a77..1b837922 100644
          .rtems,
          .serenity,
 diff --git a/src/codegen/llvm.zig b/src/codegen/llvm.zig
-index 1ba3b272..e9c9d6aa 100644
+index f086904eca..6f23268322 100644
 --- a/src/codegen/llvm.zig
 +++ b/src/codegen/llvm.zig
-@@ -235,6 +235,7 @@ pub fn targetTriple(allocator: Allocator, target: *const std.Target) ![]const u8
+@@ -239,6 +239,7 @@ pub fn targetTriple(allocator: Allocator, target: *const std.Target) ![]const u8
          .serenity => "serenity",
          .vulkan => "vulkan",
          .managarm => "managarm",
@@ -78,3 +90,6 @@ index 1ba3b272..e9c9d6aa 100644
  
          .@"3ds",
          .contiki,
+-- 
+2.50.1 (Apple Git-155)
+

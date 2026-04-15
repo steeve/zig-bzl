@@ -9,12 +9,12 @@ def repo():
         build_file = "//third_party/zig:zig.bazel",
         patch_args = ["-p1"],
         patches = [
-            "//third_party/zig/patches:0.16.x/0001-ZML-kvx-add-support-for-LLVM-backend.patch",
-            "//third_party/zig/patches:0.16.x/0002-ZML-sema-target-authorize-Zig-types-in-kvx-callconv.patch",
-            "//third_party/zig/patches:0.16.x/0003-ZML-kvx-add-ClusterOS-target.patch",
-            "//third_party/zig/patches:0.16.x/0004-ZML-kvx-add-addrspace-support.patch",
-            "//third_party/zig/patches:0.16.x/0005-ZML-zig-enable-configurable-LLVM-Clang-and-LLVM-AR.patch",
-            "//third_party/zig/patches:0.16.x/0006-ZML-zig-adapt-to-LLVM-OptBisect-API-change.patch",
+            "//third_party/zig/patches:0.16.0/0001-ZML-kvx-add-support-for-LLVM-backend.patch",
+            "//third_party/zig/patches:0.16.0/0002-ZML-sema-target-authorize-Zig-types-in-kvx-callconv.patch",
+            "//third_party/zig/patches:0.16.0/0003-ZML-kvx-add-ClusterOS-target.patch",
+            "//third_party/zig/patches:0.16.0/0004-ZML-kvx-add-addrspace-support.patch",
+            "//third_party/zig/patches:0.16.0/0005-ZML-zig-enable-configurable-LLVM-Clang-and-LLVM-AR.patch",
+            "//third_party/zig/patches:0.16.0/0006-ZML-zig-adapt-to-LLVM-22-OptBisect-API-change.patch",
         ],
     )
 
@@ -26,10 +26,10 @@ def repo():
     #     build_file = "//third_party/zig:zig.bazel",
     #     patch_args = ["-p1"],
     #     patches = [
-    #         # "//third_party/zig:patches/0001-ZML-kvx-add-support-for-LLVM-backend.patch",
-    #         # "//third_party/zig:patches/0002-ZML-sema-target-authorize-Zig-types-in-kvx-callconv.patch",
-    #         # "//third_party/zig:patches/0003-ZML-kvx-add-ClusterOS-target.patch",
-    #         # "//third_party/zig:patches/0004-ZML-kvx-add-addrspace-support.patch",
-    #         "//third_party/zig:patches/0005-ZML-zig-enable-configurable-LLVM-Clang-and-LLVM-AR.patch",
+    #         # "//third_party/zig/patches/0.16.x/0001-ZML-kvx-add-support-for-LLVM-backend.patch",
+    #         # "//third_party/zig/patches/0.16.x/0002-ZML-sema-target-authorize-Zig-types-in-kvx-callconv.patch",
+    #         # "//third_party/zig/patches/0.16.x/0003-ZML-kvx-add-ClusterOS-target.patch",
+    #         # "//third_party/zig/patches/0.16.x/0004-ZML-kvx-add-addrspace-support.patch",
+    #         "//third_party/zig/patches/0.16.x/0005-ZML-zig-enable-configurable-LLVM-Clang-and-LLVM-AR.patch",
     #     ],
     # )
