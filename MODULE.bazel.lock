@@ -303,7 +303,7 @@
     },
     "@@rules_zig+//zig:extensions.bzl%zig": {
       "general": {
-        "bzlTransitiveDigest": "Wd38EvOTDMY7npSuTwLEkvbCGnuwJj7w0VxbmIjeMB8=",
+        "bzlTransitiveDigest": "xx2lb1ba6RcnnXdfUyaxI5j2wFLM03GTQfTv2UUie3Q=",
         "usagesDigest": "PAcm85JyNxvkYdZZvKebU9Hjv/291aTiV2vBOoQygIY=",
         "recordedFileInputs": {
           "@@//index.json": "1710ecdf97790d50872503cde553e6599d7b145ac57e8bf7d8c3680498042db2",

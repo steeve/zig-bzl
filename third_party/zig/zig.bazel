@@ -77,12 +77,6 @@ filegroup(
 )
 
 filegroup(
-    name = "lib_files",
-    srcs = glob(["lib/**"]),
-    visibility = ["//visibility:public"],
-)
-
-filegroup(
     name = "zig_h",
     srcs = ["lib/zig.h"],
     visibility = ["//visibility:public"],

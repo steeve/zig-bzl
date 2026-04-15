@@ -94,6 +94,6 @@ use_repo(llvm, "llvm-project")
 
 git_override(
     module_name = "rules_zig",
-    commit = "f9a6c9e372a197b783932fd3ff2861edee4830bb", # zig-bzl
+    commit = "0fae30ea246e43b4970ba33a8f6e08bea83181bb", # zig-bzl
     remote = "https://github.com/zml/rules_zig.git",
 )

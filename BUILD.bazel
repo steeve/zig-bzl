@@ -1,8 +1,8 @@
+load("@bazel_lib//lib:transitions.bzl", "platform_transition_filegroup")
 load("@bazel_skylib//rules:common_settings.bzl", "bool_setting")
-load("@rules_zig//zig:defs.bzl", "zig_binary", "zig_asm")
+load("@rules_zig//zig:defs.bzl", "zig_asm", "zig_binary")
 load("@rules_zig//zig:toolchain.bzl", "zig_target_toolchain", "zig_toolchain")
 load(":bootstrap_binary.bzl", "bootstrap_binary", "bootstrap_directory")
-load("@bazel_lib//lib:transitions.bzl", "platform_transition_filegroup")
 
 package(features = ["layering_check"])
 
@@ -72,7 +72,7 @@ zig_toolchain(
     zig_cache = "/var/tmp/zig-cache",
     zig_exe = ":zig_from_source_binary",
     zig_h = "@zig//:zig_h",
-    zig_lib = ["@zig//:lib_files"],
+    zig_lib = "@zig//:lib_dir",
     zig_version = "0.16.0",
 )
 
