@@ -9,19 +9,19 @@ def repo():
     #     build_file_content = "#",
     # )
 
-    new_git_repository(
-        name = "llvm-raw",
-        remote = "git@github.com:zml/llvm-project.git",
-        commit = "1072be7bff97f9ff67ccd70b06591697b0828cf7", # llvmorg-22.1.3-kvx
-        build_file_content = "#",
-    )
-
     # new_git_repository(
     #     name = "llvm-raw",
     #     remote = "git@github.com:zml/llvm-project.git",
-    #     commit = "4612f8ed16306c96badbba21b4c2a7a447a8ad39",
+    #     commit = "1072be7bff97f9ff67ccd70b06591697b0828cf7", # llvmorg-22.1.3-kvx
     #     build_file_content = "#",
     # )
+
+    new_git_repository(
+        name = "llvm-raw",
+        remote = "git@github.com:zml/llvm-project.git",
+        commit = "4612f8ed16306c96badbba21b4c2a7a447a8ad39", # kalray/llvm-21
+        build_file_content = "#",
+    )
     http_archive(
         name = "llvm_zlib",
         build_file = "@llvm-raw//utils/bazel/third_party_build:zlib-ng.BUILD",

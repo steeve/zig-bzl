@@ -14,7 +14,7 @@ def repo():
             "//third_party/zig/patches:0.16.0/0003-ZML-kvx-add-ClusterOS-target.patch",
             "//third_party/zig/patches:0.16.0/0004-ZML-kvx-add-addrspace-support.patch",
             "//third_party/zig/patches:0.16.0/0005-ZML-zig-enable-configurable-LLVM-Clang-and-LLVM-AR.patch",
-            "//third_party/zig/patches:0.16.0/0006-ZML-zig-adapt-to-LLVM-22-OptBisect-API-change.patch",
+            # "//third_party/zig/patches:0.16.0/0006-ZML-zig-adapt-to-LLVM-22-OptBisect-API-change.patch",
         ],
     )
 
