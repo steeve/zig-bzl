@@ -1,6 +1,8 @@
 load("@rules_cc//cc:defs.bzl", "cc_library")
 load("@rules_zig//zig:defs.bzl", "zig_binary", "zig_library")
 
+package(default_visibility = ["//visibility:public"])
+
 zig_library(
     name = "aro",
     srcs = glob(["lib/compiler/aro/**/*.zig"]),
@@ -37,6 +39,10 @@ cc_library(
         "src/zig_llvm.h",
     ],
     copts = ["-std=c++17"],
+    linkopts = [
+        # Mandatory if we link with zig and not cc_common.link
+        "-lc++",
+    ],
     defines = ["LLVM_BUILD_STATIC"],
     deps = [
         "@llvm-project//lld:COFF",
@@ -67,6 +73,12 @@ zig_library(
 filegroup(
     name = "lib_dir",
     srcs = ["lib"],
+    visibility = ["//visibility:public"],
+)
+
+filegroup(
+    name = "zig_h",
+    srcs = ["lib/zig.h"],
     visibility = ["//visibility:public"],
 )
 
